@@ -1,0 +1,88 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace FileSplitter
+{
+    class ArgumentParser
+    {
+        public string[] Arguments { get; }
+
+        public ArgumentParser(string[] arguments) 
+        {
+            this.Arguments = arguments.Select(a => a.ToLower()).ToArray();
+        }
+
+        public bool InfoRequestReceived() =>
+            this.Arguments.Any(a => a == SwitchEnum.Info.GetAttribute<ArgumentInfo>().ArgumentSwitch);
+
+        private string GetArgument(string argSwitch) 
+        {
+            string argValue = "";
+
+            int i = 0;
+            bool argFound = false;
+            while (i < this.Arguments.Length && !argFound)
+            {
+                if (this.Arguments[i] == argSwitch)
+                {
+                    if (i + 1 == this.Arguments.Length)
+                    {
+                        throw new FileSplitException($"No value supplied for {argSwitch}");
+                    }
+                    argValue = this.Arguments[i + 1];
+                    argFound = true;
+                }
+
+                i++;
+            }
+
+            return argValue;
+        }
+
+        public FileSplitInfo BuildFileSplitInfo()
+        {
+            FileSplitInfo fileSplitInfo = null;
+
+            var recognisedSwitches = Enum.GetValues(typeof(SwitchEnum)).Cast<SwitchEnum>().Select(x => x.GetAttribute<ArgumentInfo>()).ToList();
+            ArgumentInfo filePathArgument = SwitchEnum.FilePath.GetAttribute<ArgumentInfo>();
+            ArgumentInfo numberOfChunksArgument = SwitchEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
+            ArgumentInfo chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
+            ArgumentInfo infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
+
+            var switchesInArgs = this.Arguments.Where(a => a.StartsWith("/")).ToList();
+            var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
+
+            if (recognisedSwitchesInArgs.Count() != switchesInArgs.Count())
+                throw new FileSplitException($"Unrecognised switch: {string.Join(", ", switchesInArgs.Except(recognisedSwitchesInArgs))}");
+
+            if ((switchesInArgs?.Count() ?? 0) > (recognisedSwitches?.Count() ?? 0))
+                throw new FileSplitException($"Duplicated switches");
+
+            if (!InfoRequestReceived())
+            {
+                string filePath = GetArgument(filePathArgument.ArgumentSwitch);
+                if (string.IsNullOrWhiteSpace(filePath))
+                    throw new FileSplitException($"{filePathArgument.ArgumentDescription} not specified");
+
+                string numberOfChunksString = GetArgument(numberOfChunksArgument.ArgumentSwitch);
+                int.TryParse(numberOfChunksString, out int numberOfChunks);
+
+                string chunkSizeString = GetArgument(chunkSizeArgument.ArgumentSwitch);
+                long.TryParse(chunkSizeString, out long chunkSize);
+
+                if ((string.IsNullOrWhiteSpace(numberOfChunksString) && string.IsNullOrWhiteSpace(chunkSizeString)) ||
+                    (numberOfChunks <= 0 && chunkSize <= 0) ||
+                    (numberOfChunks > 0 && chunkSize > 0))
+                    throw new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}");
+
+                if (numberOfChunks > 0)
+                    fileSplitInfo = new FileSplitInfo(filePath, numberOfChunks);
+                else if (chunkSize > 0)
+                    fileSplitInfo = new FileSplitInfo(filePath, chunkSize);
+            }
+
+            return fileSplitInfo;
+        }
+    }
+}
