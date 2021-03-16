@@ -20,7 +20,13 @@ namespace FileSplitter
                 else
                 {
                     Console.WriteLine($"{Environment.NewLine}{fileSplitInfo}{Environment.NewLine}" +
-                                      $"{Environment.NewLine}To do: file splitting");
+                                      $"{Environment.NewLine}Splitting file...{Environment.NewLine}");
+
+                    Splitter splitter = new Splitter(fileSplitInfo);
+                    splitter.Split();
+
+                    Console.WriteLine($"{Environment.NewLine}Created files:{Environment.NewLine}" +
+                                      $"{string.Join(",", splitter.CreatedFiles)}");
                 }
             }
             catch (FileSplitException ex)
