@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using FileSplitter.Splitter;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FileSplitter
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
@@ -19,20 +24,20 @@ namespace FileSplitter
                 }
                 else
                 {
-                    Console.WriteLine($"{Environment.NewLine}{fileSplitInfo}{Environment.NewLine}" +
-                                      $"{Environment.NewLine}Splitting file...{Environment.NewLine}");
+                    Console.WriteLine($"{fileSplitInfo}{Environment.NewLine}" +
+                                      $"Splitting file...");
 
-                    Splitter splitter = new Splitter(fileSplitInfo);
-                    splitter.Split();
+                    SplitterBase splitter = fileSplitInfo.NumberOfChunks > 0 ? new NumberOfChunksSplitter(fileSplitInfo) : new SizeOfChunksSplitter(fileSplitInfo);
+                    await splitter.Split();
 
-                    Console.WriteLine($"{Environment.NewLine}Created files:{Environment.NewLine}" +
-                                      $"{string.Join(",", splitter.CreatedFiles)}");
+                    Console.WriteLine($"Created files:{Environment.NewLine}" +
+                                      $"{string.Join(Environment.NewLine, splitter.CreatedFiles)}");
                 }
             }
             catch (FileSplitException ex)
             {
                 Console.WriteLine($"{Environment.NewLine}{ex.Message}{Environment.NewLine}");
-                Console.WriteLine($"Supported syntax:{Environment.NewLine}{PrintOptions()}");
+                Console.WriteLine($"Supported syntax:{PrintOptions()}");
             }
             catch (Exception ex)
             {
@@ -46,7 +51,7 @@ namespace FileSplitter
             foreach (SwitchEnum switchOption in Enum.GetValues(typeof(SwitchEnum)))
             {
                 var argumentInfo = switchOption.GetAttribute<ArgumentInfo>();
-                options += $"{argumentInfo.ArgumentSwitch} = {argumentInfo.ArgumentDescription}{Environment.NewLine}";
+                options += $"{Environment.NewLine}{argumentInfo.ArgumentSwitch} = {argumentInfo.ArgumentDescription}";
             }
 
             return options;

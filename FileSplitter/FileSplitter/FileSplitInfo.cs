@@ -27,7 +27,7 @@ namespace FileSplitter
         public override string ToString() =>
             $"{nameof(FileSplitInfo)}:{Environment.NewLine}" + 
             $"{nameof(FilePath)} = {FilePath}{Environment.NewLine}" +
-            $"{nameof(NumberOfChunks)} = {NumberOfChunks}{Environment.NewLine}" +
-            $"{nameof(ChunkSize)} = {ChunkSize}";
+            (NumberOfChunks > 0 ? $"{nameof(NumberOfChunks)} = {NumberOfChunks}{Environment.NewLine}" : "") +
+            (ChunkSize > 0 ? $"{nameof(ChunkSize)} = {ChunkSize}" : "");
     }
 }
