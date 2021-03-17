@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace FileSplitter
 {
-    class ArgumentParser
+    public class ArgumentParser
     {
         public string[] Arguments { get; }
 
         public ArgumentParser(string[] arguments) 
         {
-            this.Arguments = arguments.Select(a => a.ToLower()).ToArray();
+            this.Arguments = arguments;
         }
 
         public bool InfoRequestReceived() =>
