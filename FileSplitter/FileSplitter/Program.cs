@@ -15,10 +15,9 @@ namespace FileSplitter
         {
             try
             {
-                var argParser = new ArgumentParser(args);
-                var fileSplitInfo = argParser.BuildFileSplitInfo();
+                var fileSplitInfo = ArgumentParser.BuildFileSplitInfo(args);
 
-                if (argParser.InfoRequestReceived())
+                if (ArgumentParser.InfoRequestReceived(args))
                 {
                     Console.WriteLine($"{Environment.NewLine}Supported syntax:{Environment.NewLine}{PrintOptions()}");
                 }
@@ -56,5 +55,6 @@ namespace FileSplitter
 
             return options;
         }
+        // Todo: add dependency injection and file config
     }
 }

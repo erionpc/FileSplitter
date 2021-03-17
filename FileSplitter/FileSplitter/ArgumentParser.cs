@@ -3,34 +3,29 @@ using System.Linq;
 
 namespace FileSplitter
 {
-    public class ArgumentParser
+    public static class ArgumentParser
     {
-        public string[] Arguments { get; }
+        public static bool InfoRequestReceived(string[] arguments) =>
+            arguments.Any(a => a == SwitchEnum.Info.GetAttribute<ArgumentInfo>().ArgumentSwitch);
 
-        public ArgumentParser(string[] arguments) 
-        {
-            this.Arguments = arguments;
-        }
-
-        public bool InfoRequestReceived() =>
-            this.Arguments.Any(a => a == SwitchEnum.Info.GetAttribute<ArgumentInfo>().ArgumentSwitch);
-
-        private string GetArgument(string argSwitch) 
+        private static string GetArgument(string[] arguments, string argSwitch) 
         {
             string argValue = "";
 
             int i = 0;
             bool argFound = false;
-            while (i < this.Arguments.Length && !argFound)
+            while (i < arguments.Length && !argFound)
             {
-                if (this.Arguments[i] == argSwitch)
+                if (arguments[i] == argSwitch)
                 {
-                    if (i + 1 == this.Arguments.Length)
-                    {
+                    if (i + 1 == arguments.Length)
                         throw new FileSplitException($"No value supplied for {argSwitch}");
+
+                    if (!arguments[i + 1].StartsWith("/"))
+                    { 
+                        argValue = arguments[i + 1];
+                        argFound = true;
                     }
-                    argValue = this.Arguments[i + 1];
-                    argFound = true;
                 }
 
                 i++;
@@ -39,7 +34,7 @@ namespace FileSplitter
             return argValue;
         }
 
-        public FileSplitInfo BuildFileSplitInfo()
+        public static FileSplitInfo BuildFileSplitInfo(string[] arguments)
         {
             FileSplitInfo fileSplitInfo = null;
 
@@ -49,25 +44,25 @@ namespace FileSplitter
             ArgumentInfo chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
             ArgumentInfo infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
 
-            var switchesInArgs = this.Arguments.Where(a => a.StartsWith("/")).ToList();
+            var switchesInArgs = arguments.Where(a => a.StartsWith("/")).ToList();
             var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
 
             if (recognisedSwitchesInArgs.Count() != switchesInArgs.Count())
                 throw new FileSplitException($"Unrecognised switch: {string.Join(", ", switchesInArgs.Except(recognisedSwitchesInArgs))}");
 
-            if ((switchesInArgs?.Count() ?? 0) > (recognisedSwitches?.Count() ?? 0))
+            if ((switchesInArgs?.Count() ?? 0) > (switchesInArgs?.Select(x => x?.ToLower())?.Distinct()?.Count() ?? 0))
                 throw new FileSplitException($"Duplicated switches");
 
-            if (!InfoRequestReceived())
+            if (!InfoRequestReceived(arguments))
             {
-                string filePath = GetArgument(filePathArgument.ArgumentSwitch);
+                string filePath = GetArgument(arguments, filePathArgument.ArgumentSwitch);
                 if (string.IsNullOrWhiteSpace(filePath))
                     throw new FileSplitException($"{filePathArgument.ArgumentDescription} not specified");
 
-                string numberOfChunksString = GetArgument(numberOfChunksArgument.ArgumentSwitch);
+                string numberOfChunksString = GetArgument(arguments, numberOfChunksArgument.ArgumentSwitch);
                 int.TryParse(numberOfChunksString, out int numberOfChunks);
 
-                string chunkSizeString = GetArgument(chunkSizeArgument.ArgumentSwitch);
+                string chunkSizeString = GetArgument(arguments, chunkSizeArgument.ArgumentSwitch);
                 long.TryParse(chunkSizeString, out long chunkSize);
 
                 if ((string.IsNullOrWhiteSpace(numberOfChunksString) && string.IsNullOrWhiteSpace(chunkSizeString)) ||

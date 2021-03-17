@@ -16,10 +16,8 @@ namespace FileSplitter.Splitter
             var fileInfo = new FileInfo(FileSplittingInfo.FilePath);
             long originalSize = fileInfo.Length;
             long chunkSize = (long)Math.Ceiling((double)fileInfo.Length / FileSplittingInfo.NumberOfChunks);
-
-            var dirInfo = new DirectoryInfo(fileInfo.DirectoryName);
-
             long totalChunksSize = 0;
+            
             using (var readStream = new FileStream(fileInfo.FullName,
                                                    FileMode.Open,
                                                    FileAccess.Read,
@@ -33,7 +31,7 @@ namespace FileSplitter.Splitter
                     using (var writeStream = new FileStream(chunkFileName,
                                                             FileMode.Create,
                                                             FileAccess.Write,
-                                                            FileShare.Write,
+                                                            FileShare.Read,
                                                             BufferSize,
                                                             FileOptions.Asynchronous))
                     {
@@ -75,19 +73,13 @@ namespace FileSplitter.Splitter
         private int getCurrentBufferSize(long currentChunkSize, long chunkSize, int bufferSize)
         {
             if (currentChunkSize + BufferSize <= chunkSize)
-            {
                 return BufferSize;
-            }
             else
             {
                 if (BufferSize > chunkSize)
-                {
                     return (int)chunkSize;
-                }
                 else
-                {
                     return (int)(chunkSize - currentChunkSize);
-                }
             }
         }
     }

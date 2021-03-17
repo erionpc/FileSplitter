@@ -13,6 +13,7 @@ namespace FileSplitter.Splitter
 
         public override Task Split()
         {
+            // Todo: Implement SizeOfChunksSplitter
             throw new NotImplementedException();
         }
     }

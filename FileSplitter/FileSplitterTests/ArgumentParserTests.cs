@@ -10,47 +10,113 @@ namespace FileSplitter.Tests
 {
     public class ArgumentParserTests
     {
-        ArgumentInfo filePathArgument = SwitchEnum.FilePath.GetAttribute<ArgumentInfo>();
-        ArgumentInfo numberOfChunksArgument = SwitchEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
-        ArgumentInfo chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
-        ArgumentInfo infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
+        static ArgumentInfo filePathArgument = SwitchEnum.FilePath.GetAttribute<ArgumentInfo>();
+        static ArgumentInfo numberOfChunksArgument = SwitchEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
+        static ArgumentInfo chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
+        static ArgumentInfo infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
 
-        [Fact()]
-        public void BuildFileSplitInfoTest_ValidForNumberOfChunks()
+        public static IEnumerable<object[]> TestData() 
         {
-            string filePath = @"C:\TestPath\testFile.txt";
-            int numberOfChunks = 3;
-
-            ArgumentParser parser = new ArgumentParser(new[] { filePathArgument.ArgumentSwitch, 
-                                                               filePath, 
-                                                               numberOfChunksArgument.ArgumentSwitch, 
-                                                               numberOfChunks.ToString() });
-
-            var expected = new FileSplitInfo(filePath, numberOfChunks);
-            var actual = parser.BuildFileSplitInfo();
-
-            Assert.Equal(expected.FilePath, actual.FilePath);
-            Assert.Equal(expected.NumberOfChunks, actual.NumberOfChunks);
-            Assert.Equal(expected.ChunkSize, actual.ChunkSize);
+            string filePath = @"C:\filepath\file.txt";
+            yield return new object[] 
+            { 
+                "test with /f and /c", 
+                new string[] { "/f", filePath, "/c", "3" },
+                new FileSplitInfo(filePath, 3),
+                null
+            };
+            yield return new object[]
+            {
+                "test with /f and /s",
+                new string[] { "/f", filePath, "/s", "3" },
+                new FileSplitInfo(filePath, (long)3),
+                null
+            };
+            yield return new object[]
+            {
+                "test with only /f",
+                new string[] { "/f", filePath },
+                null,
+                new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}")
+            };
+            yield return new object[]
+            {
+                "test with /f, /c and /s",
+                new string[] { "/f", filePath, "/c", "3", "/s", "3"  },
+                null,
+                new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}")
+            };
+            yield return new object[]
+            {
+                "test with /f and /c 0",
+                new string[] { "/f", filePath, "/c", "0" },
+                null,
+                new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}")
+            };
+            yield return new object[]
+            {
+                "test with only /c",
+                new string[] { "/c", "3" },
+                null,
+                new FileSplitException($"{filePathArgument.ArgumentDescription} not specified")
+            };
+            yield return new object[]
+            {
+                "test with only /s",
+                new string[] { "/s", "3" },
+                null,
+                new FileSplitException($"{filePathArgument.ArgumentDescription} not specified")
+            };
+            yield return new object[]
+            {
+                "test with /f and /a",
+                new string[] { "/f", filePath, "/a", "3" },
+                null,
+                new FileSplitException($"Unrecognised switch: /a")
+            };
+            yield return new object[]
+            {
+                "test with /f and /c without filename",
+                new string[] { "/f", "/c", "3" },
+                null,
+                new FileSplitException($"{filePathArgument.ArgumentDescription} not specified")
+            };
+            yield return new object[]
+            {
+                "test with /f and /c without value",
+                new string[] { "/f", filePath, "/c" },
+                null,
+                new FileSplitException($"No value supplied for /c")
+            };
+            yield return new object[]
+            {
+                "test with /f and 2 /c",
+                new string[] { "/f", filePath, "/c", "3", "/c", "3" },
+                null,
+                new FileSplitException($"Duplicated switches")
+            };
         }
 
-        [Fact()]
-        public void BuildFileSplitInfoTest_ValidForChunkSize()
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void BuildFileSplitInfoTest(string testCase, string[] arguments, FileSplitInfo expectedResult, Exception expectedException)
         {
-            string filePath = @"C:\TestPath\testFile.txt";
-            long chunkSize = 50892;
+            try
+            {
+                var actual = ArgumentParser.BuildFileSplitInfo(arguments);
 
-            ArgumentParser parser = new ArgumentParser(new[] { filePathArgument.ArgumentSwitch,
-                                                               filePath,
-                                                               chunkSizeArgument.ArgumentSwitch,
-                                                               chunkSize.ToString() });
-
-            var expected = new FileSplitInfo(filePath, chunkSize);
-            var actual = parser.BuildFileSplitInfo();
-
-            Assert.Equal(expected.FilePath, actual.FilePath);
-            Assert.Equal(expected.NumberOfChunks, actual.NumberOfChunks);
-            Assert.Equal(expected.ChunkSize, actual.ChunkSize);
+                Assert.NotNull(testCase);
+                Assert.Equal(expectedResult.FilePath, actual.FilePath);
+                Assert.Equal(expectedResult.NumberOfChunks, actual.NumberOfChunks);
+                Assert.Equal(expectedResult.ChunkSize, actual.ChunkSize);
+            }
+            catch (Exception ex)
+            {
+                Assert.Equal(expectedException.GetType().FullName, ex.GetType().FullName);
+                Assert.Equal(expectedException.Message, ex.Message);
+            }
         }
+
+        // Todo: Add unit tests for NumberOfChunkSplitter
     }
 }
