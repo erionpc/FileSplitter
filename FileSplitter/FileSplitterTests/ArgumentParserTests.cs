@@ -103,7 +103,8 @@ namespace FileSplitter.Tests
         {
             try
             {
-                var actual = ArgumentParser.BuildFileSplitInfo(arguments);
+                var argumentParser = new ArgumentParser(arguments);
+                var actual = argumentParser.BuildFileSplitInfo();
 
                 Assert.NotNull(testCase);
                 Assert.Equal(expectedResult.FilePath, actual.FilePath);

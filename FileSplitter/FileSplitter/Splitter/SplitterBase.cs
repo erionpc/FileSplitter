@@ -6,15 +6,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace FileSplitter.Splitter
 {
-    internal abstract class SplitterBase
+    internal abstract class SplitterBase : ISplitter
     {
         internal FileSplitInfo FileSplittingInfo { get; private set; }
 
         public List<string> CreatedFiles { get; protected internal set; } = new List<string>();
 
-        internal int BufferSize 
-        { 
-            get 
+        internal int BufferSize
+        {
+            get
             {
                 int defaultSize = 4096;
                 if (FileSplittingInfo.ChunkSize > 0 && FileSplittingInfo.ChunkSize < defaultSize)

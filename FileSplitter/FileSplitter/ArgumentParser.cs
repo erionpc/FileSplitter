@@ -3,27 +3,34 @@ using System.Linq;
 
 namespace FileSplitter
 {
-    public static class ArgumentParser
+    public class ArgumentParser : IArgumentParser
     {
-        public static bool InfoRequestReceived(string[] arguments) =>
-            arguments.Any(a => a == SwitchEnum.Info.GetAttribute<ArgumentInfo>().ArgumentSwitch);
+        public string[] Arguments { get; }
 
-        private static string GetArgument(string[] arguments, string argSwitch) 
+        public ArgumentParser(string[] arguments)
+        {
+            this.Arguments = arguments;
+        }
+
+        public bool InfoRequestReceived() =>
+            Arguments.Any(a => a == SwitchEnum.Info.GetAttribute<ArgumentInfo>().ArgumentSwitch);
+
+        private string GetArgument(string argSwitch)
         {
             string argValue = "";
 
             int i = 0;
             bool argFound = false;
-            while (i < arguments.Length && !argFound)
+            while (i < Arguments.Length && !argFound)
             {
-                if (arguments[i] == argSwitch)
+                if (Arguments[i] == argSwitch)
                 {
-                    if (i + 1 == arguments.Length)
+                    if (i + 1 == Arguments.Length)
                         throw new FileSplitException($"No value supplied for {argSwitch}");
 
-                    if (!arguments[i + 1].StartsWith("/"))
-                    { 
-                        argValue = arguments[i + 1];
+                    if (!Arguments[i + 1].StartsWith("/"))
+                    {
+                        argValue = Arguments[i + 1];
                         argFound = true;
                     }
                 }
@@ -34,7 +41,7 @@ namespace FileSplitter
             return argValue;
         }
 
-        public static FileSplitInfo BuildFileSplitInfo(string[] arguments)
+        public FileSplitInfo BuildFileSplitInfo()
         {
             FileSplitInfo fileSplitInfo = null;
 
@@ -44,7 +51,7 @@ namespace FileSplitter
             ArgumentInfo chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
             ArgumentInfo infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
 
-            var switchesInArgs = arguments.Where(a => a.StartsWith("/")).ToList();
+            var switchesInArgs = Arguments.Where(a => a.StartsWith("/")).ToList();
             var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
 
             if (recognisedSwitchesInArgs.Count() != switchesInArgs.Count())
@@ -53,16 +60,16 @@ namespace FileSplitter
             if ((switchesInArgs?.Count() ?? 0) > (switchesInArgs?.Select(x => x?.ToLower())?.Distinct()?.Count() ?? 0))
                 throw new FileSplitException($"Duplicated switches");
 
-            if (!InfoRequestReceived(arguments))
+            if (!InfoRequestReceived())
             {
-                string filePath = GetArgument(arguments, filePathArgument.ArgumentSwitch);
+                string filePath = GetArgument(filePathArgument.ArgumentSwitch);
                 if (string.IsNullOrWhiteSpace(filePath))
                     throw new FileSplitException($"{filePathArgument.ArgumentDescription} not specified");
 
-                string numberOfChunksString = GetArgument(arguments, numberOfChunksArgument.ArgumentSwitch);
+                string numberOfChunksString = GetArgument(numberOfChunksArgument.ArgumentSwitch);
                 int.TryParse(numberOfChunksString, out int numberOfChunks);
 
-                string chunkSizeString = GetArgument(arguments, chunkSizeArgument.ArgumentSwitch);
+                string chunkSizeString = GetArgument(chunkSizeArgument.ArgumentSwitch);
                 long.TryParse(chunkSizeString, out long chunkSize);
 
                 if ((string.IsNullOrWhiteSpace(numberOfChunksString) && string.IsNullOrWhiteSpace(chunkSizeString)) ||
