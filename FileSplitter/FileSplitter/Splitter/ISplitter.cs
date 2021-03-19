@@ -7,6 +7,8 @@ namespace FileSplitter.Splitter
     {
         List<string> CreatedFiles { get; }
 
+        FileSplitInfo FileSplittingInfo { get; set; }
+
         Task Split();
     }
 }

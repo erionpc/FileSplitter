@@ -8,7 +8,9 @@ namespace FileSplitter.Splitter
 {
     internal abstract class SplitterBase : ISplitter
     {
-        internal FileSplitInfo FileSplittingInfo { get; private set; }
+        public FileSplitInfo FileSplittingInfo { get; set; }
+        
+        protected IConfiguration Configuration { get; }
 
         public List<string> CreatedFiles { get; protected internal set; } = new List<string>();
 
@@ -16,7 +18,7 @@ namespace FileSplitter.Splitter
         {
             get
             {
-                int defaultSize = 4096;
+                int defaultSize = Configuration.GetValue<int>("Runtime:Buffersize");
                 if (FileSplittingInfo.ChunkSize > 0 && FileSplittingInfo.ChunkSize < defaultSize)
                     return (int)FileSplittingInfo.ChunkSize;
                 else
@@ -24,14 +26,14 @@ namespace FileSplitter.Splitter
             }
         }
 
-        public SplitterBase(FileSplitInfo fileSplitInfo)
+        public SplitterBase(IConfiguration config)
         {
-            FileSplittingInfo = fileSplitInfo;
+            this.Configuration = config;
         }
 
         abstract public Task Split();
 
-        protected internal string GetChunkFileName(FileInfo fileInfo, int chunkNumber) =>
+        protected internal static string GetChunkFileName(FileInfo fileInfo, int chunkNumber) =>
             $"{fileInfo.DirectoryName}{Path.DirectorySeparatorChar}{fileInfo.Name}.part_{chunkNumber}";
     }
 }

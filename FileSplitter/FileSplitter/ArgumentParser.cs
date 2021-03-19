@@ -5,11 +5,10 @@ namespace FileSplitter
 {
     public class ArgumentParser : IArgumentParser
     {
-        public string[] Arguments { get; }
+        public string[] Arguments { get; set; }
 
-        public ArgumentParser(string[] arguments)
+        public ArgumentParser()
         {
-            this.Arguments = arguments;
         }
 
         public bool InfoRequestReceived() =>
@@ -54,10 +53,10 @@ namespace FileSplitter
             var switchesInArgs = Arguments.Where(a => a.StartsWith("/")).ToList();
             var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
 
-            if (recognisedSwitchesInArgs.Count() != switchesInArgs.Count())
+            if (recognisedSwitchesInArgs.Count != switchesInArgs.Count)
                 throw new FileSplitException($"Unrecognised switch: {string.Join(", ", switchesInArgs.Except(recognisedSwitchesInArgs))}");
 
-            if ((switchesInArgs?.Count() ?? 0) > (switchesInArgs?.Select(x => x?.ToLower())?.Distinct()?.Count() ?? 0))
+            if ((switchesInArgs?.Count ?? 0) > (switchesInArgs?.Select(x => x?.ToLower())?.Distinct()?.Count() ?? 0))
                 throw new FileSplitException($"Duplicated switches");
 
             if (!InfoRequestReceived())

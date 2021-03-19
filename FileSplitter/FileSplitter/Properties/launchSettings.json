@@ -1,7 +1,8 @@
 {
   "profiles": {
     "FileSplitter": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "/f C:\\Users\\Lenovo\\source\\repos\\erionpc\\FileSplitter\\FileSplitter\\Tests\\testA.txt /c 3"
     }
   }
 }

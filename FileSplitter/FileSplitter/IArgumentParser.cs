@@ -2,7 +2,7 @@
 {
     public interface IArgumentParser
     {
-        string[] Arguments { get; }
+        string[] Arguments { get; set; }
 
         FileSplitInfo BuildFileSplitInfo();
         bool InfoRequestReceived();

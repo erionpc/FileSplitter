@@ -10,10 +10,10 @@ namespace FileSplitter.Tests
 {
     public class ArgumentParserTests
     {
-        static ArgumentInfo filePathArgument = SwitchEnum.FilePath.GetAttribute<ArgumentInfo>();
-        static ArgumentInfo numberOfChunksArgument = SwitchEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
-        static ArgumentInfo chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
-        static ArgumentInfo infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _filePathArgument = SwitchEnum.FilePath.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _numberOfChunksArgument = SwitchEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _chunkSizeArgument = SwitchEnum.ChunkSize.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _infoArgument = SwitchEnum.Info.GetAttribute<ArgumentInfo>();
 
         public static IEnumerable<object[]> TestData() 
         {
@@ -37,35 +37,35 @@ namespace FileSplitter.Tests
                 "test with only /f",
                 new string[] { "/f", filePath },
                 null,
-                new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}")
+                new FileSplitException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
             };
             yield return new object[]
             {
                 "test with /f, /c and /s",
                 new string[] { "/f", filePath, "/c", "3", "/s", "3"  },
                 null,
-                new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}")
+                new FileSplitException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
             };
             yield return new object[]
             {
                 "test with /f and /c 0",
                 new string[] { "/f", filePath, "/c", "0" },
                 null,
-                new FileSplitException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}")
+                new FileSplitException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
             };
             yield return new object[]
             {
                 "test with only /c",
                 new string[] { "/c", "3" },
                 null,
-                new FileSplitException($"{filePathArgument.ArgumentDescription} not specified")
+                new FileSplitException($"{_filePathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
                 "test with only /s",
                 new string[] { "/s", "3" },
                 null,
-                new FileSplitException($"{filePathArgument.ArgumentDescription} not specified")
+                new FileSplitException($"{_filePathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
@@ -79,7 +79,7 @@ namespace FileSplitter.Tests
                 "test with /f and /c without filename",
                 new string[] { "/f", "/c", "3" },
                 null,
-                new FileSplitException($"{filePathArgument.ArgumentDescription} not specified")
+                new FileSplitException($"{_filePathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
@@ -103,7 +103,10 @@ namespace FileSplitter.Tests
         {
             try
             {
-                var argumentParser = new ArgumentParser(arguments);
+                var argumentParser = new ArgumentParser
+                {
+                    Arguments = arguments
+                };
                 var actual = argumentParser.BuildFileSplitInfo();
 
                 Assert.NotNull(testCase);

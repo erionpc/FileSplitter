@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace FileSplitter.Splitter
 {
     internal class NumberOfChunksSplitter : SplitterBase
     {
-        public NumberOfChunksSplitter(FileSplitInfo fileSplitInfo) : base(fileSplitInfo)
+        public NumberOfChunksSplitter(IConfiguration config) : base(config)
         {
         }
 
@@ -44,7 +45,7 @@ namespace FileSplitter.Splitter
                         long currentChunkSize = 0;
                         while (currentChunkSize < chunkSize)
                         {
-                            int currentBufferSize = getCurrentBufferSize(currentChunkSize, chunkSize, BufferSize);                            
+                            int currentBufferSize = GetCurrentBufferSize(currentChunkSize, chunkSize);                            
 
                             byte[] currentBuffer = new byte[currentBufferSize];
                             await readStream.ReadAsync(currentBuffer, 0, currentBufferSize);
@@ -70,7 +71,7 @@ namespace FileSplitter.Splitter
                 throw new FileSplitException($"File not split correctly! Difference in bytes: { originalSize - totalChunksSize }");
         }
 
-        private int getCurrentBufferSize(long currentChunkSize, long chunkSize, int bufferSize)
+        private int GetCurrentBufferSize(long currentChunkSize, long chunkSize)
         {
             if (currentChunkSize + BufferSize <= chunkSize)
                 return BufferSize;

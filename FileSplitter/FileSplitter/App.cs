@@ -11,22 +11,26 @@ namespace FileSplitter
     public class App
     {
         private readonly IConfiguration _config;
-        private readonly ISplitter _fileSplitter;
+        private readonly ISplitter _numberOfChunksSplitter;
+        private readonly ISplitter _sizeOfChunksSplitter;
+        private readonly IArgumentParser _argumentParser;
 
-        public App(IConfiguration config, ISplitter fileSplitter)
+        public App(IConfiguration config, IArgumentParser argParser, Func<SplitterType, ISplitter> splitterTypeResolver)
         {
             _config = config;
-            _fileSplitter = fileSplitter;
+            _numberOfChunksSplitter = splitterTypeResolver(SplitterType.NumberOfChunksSplitter);
+            _sizeOfChunksSplitter = splitterTypeResolver(SplitterType.SizeOfChunksSplitter);
+            _argumentParser = argParser;
         }
 
         public async Task Run(string[] args)
         {
             try
             {
-                var argumentParser = new ArgumentParser(args);
-                var fileSplitInfo = argumentParser.BuildFileSplitInfo();
+                _argumentParser.Arguments = args;
+                var fileSplitInfo = _argumentParser.BuildFileSplitInfo();
 
-                if (argumentParser.InfoRequestReceived())
+                if (_argumentParser.InfoRequestReceived())
                 {
                     Console.WriteLine($"{Environment.NewLine}Supported syntax:{Environment.NewLine}{PrintOptions()}");
                 }
@@ -35,7 +39,13 @@ namespace FileSplitter
                     Console.WriteLine($"{fileSplitInfo}{Environment.NewLine}" +
                                       $"Splitting file...");
 
-                    SplitterBase splitter = fileSplitInfo.NumberOfChunks > 0 ? new NumberOfChunksSplitter(fileSplitInfo) : new SizeOfChunksSplitter(fileSplitInfo);
+                    ISplitter splitter = null;
+                    if (fileSplitInfo.NumberOfChunks > 0)
+                        splitter = _numberOfChunksSplitter;
+                    else if (fileSplitInfo.ChunkSize > 0)
+                        splitter = _sizeOfChunksSplitter;
+
+                    splitter.FileSplittingInfo = fileSplitInfo;
                     await splitter.Split();
 
                     Console.WriteLine($"Created files:{Environment.NewLine}" +

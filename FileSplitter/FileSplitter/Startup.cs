@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FileSplitter.Splitter;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -9,24 +10,41 @@ using System.Threading.Tasks;
 
 namespace FileSplitter
 {
+    public delegate ISplitter SplitterTypeResolver(SplitterType splitterType);
+
     public class Startup
     {
-        internal static IServiceCollection ConfigureServices()
+        private static IServiceCollection ConfigureServices()
         {
             IServiceCollection services = new ServiceCollection();
 
             var config = LoadConfiguration();
             services.AddSingleton(config);
 
-            // var splitter = Todo: complete dependency injection
-
             // required to run the application
             services.AddTransient<App>();
+            services.AddTransient<IArgumentParser, ArgumentParser>();
+
+            services.AddScoped<ISplitter, NumberOfChunksSplitter>();
+            services.AddScoped<ISplitter, SizeOfChunksSplitter>();
+
+            services.AddTransient<SplitterTypeResolver>(serviceProvider => serviceTypeName => 
+            {
+                switch (serviceTypeName)
+                {
+                    case SplitterType.NumberOfChunksSplitter:
+                        return serviceProvider.GetService<NumberOfChunksSplitter>();
+                    case SplitterType.SizeOfChunksSplitter:
+                        return serviceProvider.GetService<SizeOfChunksSplitter>();
+                    default:
+                        return null;
+                }
+            });
 
             return services;
         }
 
-        internal static IConfiguration LoadConfiguration()
+        private static IConfiguration LoadConfiguration()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
