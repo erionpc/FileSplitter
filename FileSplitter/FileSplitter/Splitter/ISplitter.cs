@@ -5,6 +5,8 @@ namespace FileSplitter.Splitter
 {
     public interface ISplitter
     {
+        SplitterType TypeOfSplitter { get; protected set; }
+
         List<string> CreatedFiles { get; }
 
         FileSplitInfo FileSplittingInfo { get; set; }

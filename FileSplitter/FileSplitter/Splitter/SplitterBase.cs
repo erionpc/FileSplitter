@@ -8,6 +8,8 @@ namespace FileSplitter.Splitter
 {
     internal abstract class SplitterBase : ISplitter
     {
+        protected SplitterType _typeOfSplitter;
+
         public FileSplitInfo FileSplittingInfo { get; set; }
         
         protected IConfiguration Configuration { get; }
@@ -18,12 +20,17 @@ namespace FileSplitter.Splitter
         {
             get
             {
-                int defaultSize = Configuration.GetValue<int>("Runtime:Buffersize");
+                int defaultSize = Configuration.GetValue<int>("SplitterConfig:Buffersize");
                 if (FileSplittingInfo.ChunkSize > 0 && FileSplittingInfo.ChunkSize < defaultSize)
                     return (int)FileSplittingInfo.ChunkSize;
                 else
                     return defaultSize;
             }
+        }
+
+        SplitterType ISplitter.TypeOfSplitter {
+            get => _typeOfSplitter;
+            set => _typeOfSplitter = value;
         }
 
         public SplitterBase(IConfiguration config)

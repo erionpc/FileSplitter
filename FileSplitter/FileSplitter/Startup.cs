@@ -21,25 +21,10 @@ namespace FileSplitter
             var config = LoadConfiguration();
             services.AddSingleton(config);
 
-            // required to run the application
-            services.AddTransient<App>();
             services.AddTransient<IArgumentParser, ArgumentParser>();
-
-            services.AddScoped<ISplitter, NumberOfChunksSplitter>();
-            services.AddScoped<ISplitter, SizeOfChunksSplitter>();
-
-            services.AddTransient<SplitterTypeResolver>(serviceProvider => serviceTypeName => 
-            {
-                switch (serviceTypeName)
-                {
-                    case SplitterType.NumberOfChunksSplitter:
-                        return serviceProvider.GetService<NumberOfChunksSplitter>();
-                    case SplitterType.SizeOfChunksSplitter:
-                        return serviceProvider.GetService<SizeOfChunksSplitter>();
-                    default:
-                        return null;
-                }
-            });
+            services.AddTransient<ISplitter, NumberOfChunksSplitter>();
+            services.AddTransient<ISplitter, SizeOfChunksSplitter>();
+            services.AddTransient<App>();
 
             return services;
         }

@@ -15,11 +15,11 @@ namespace FileSplitter
         private readonly ISplitter _sizeOfChunksSplitter;
         private readonly IArgumentParser _argumentParser;
 
-        public App(IConfiguration config, IArgumentParser argParser, Func<SplitterType, ISplitter> splitterTypeResolver)
+        public App(IConfiguration config, IArgumentParser argParser, IEnumerable<ISplitter> splitters)
         {
             _config = config;
-            _numberOfChunksSplitter = splitterTypeResolver(SplitterType.NumberOfChunksSplitter);
-            _sizeOfChunksSplitter = splitterTypeResolver(SplitterType.SizeOfChunksSplitter);
+            _numberOfChunksSplitter = splitters.FirstOrDefault(x => x.TypeOfSplitter == SplitterType.NumberOfChunksSplitter);
+            _sizeOfChunksSplitter = splitters.FirstOrDefault(x => x.TypeOfSplitter == SplitterType.SizeOfChunksSplitter);
             _argumentParser = argParser;
         }
 

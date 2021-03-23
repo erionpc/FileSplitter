@@ -10,6 +10,7 @@ namespace FileSplitter.Splitter
     {
         public NumberOfChunksSplitter(IConfiguration config) : base(config)
         {
+            _typeOfSplitter = SplitterType.NumberOfChunksSplitter;
         }
 
         public override async Task Split()
