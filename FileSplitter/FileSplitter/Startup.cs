@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 
 namespace FileSplitter
 {
-    public delegate ISplitter SplitterTypeResolver(SplitterType splitterType);
-
     public class Startup
     {
         private static IServiceCollection ConfigureServices()
