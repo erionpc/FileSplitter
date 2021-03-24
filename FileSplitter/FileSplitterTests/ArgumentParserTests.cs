@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FileSplitter.Splitter;
 
 namespace FileSplitter.Tests
 {
@@ -122,5 +123,7 @@ namespace FileSplitter.Tests
         }
 
         // Todo: Add unit tests for NumberOfChunkSplitter
+        // Todo: Add unit tests for SizeOfChunkSplitter
+        // Todo: Add unit tests for Merger
     }
 }

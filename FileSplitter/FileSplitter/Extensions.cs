@@ -10,13 +10,10 @@ namespace FileSplitter
 {
     public static class Extensions
     {
-        public static T GetAttribute<T>(this Enum enumValue)
-                where T : Attribute
-        {
-            return enumValue.GetType()
+        public static T GetAttribute<T>(this Enum enumValue) where T : Attribute =>
+            enumValue.GetType()
                             .GetMember(enumValue.ToString())
                             .First()
                             .GetCustomAttribute<T>();
-        }
     }
 }
