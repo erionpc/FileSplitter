@@ -26,6 +26,7 @@ namespace FileSplitter.Splitter
 
             int numberOfChunks = (int)Math.Ceiling((double)fileInfo.Length / FileSplittingInfo.ChunkSize);
             long totalChunksSize = 0;
+            long currentChunkFinalSize = FileSplittingInfo.ChunkSize;
 
             using (var readStream = new FileStream(fileInfo.FullName,
                                                    FileMode.Open,
@@ -37,6 +38,7 @@ namespace FileSplitter.Splitter
                 for (int i = 0; i < numberOfChunks; i++)
                 {
                     string chunkFileName = GetChunkFileName(fileInfo, i + 1);
+
                     using (var writeStream = new FileStream(chunkFileName,
                                                             FileMode.Create,
                                                             FileAccess.Write,
@@ -51,9 +53,9 @@ namespace FileSplitter.Splitter
                             throw new FileSplitException($"Can't write to path: '{chunkFileName}'");
 
                         long currentChunkSize = 0;
-                        while (currentChunkSize < chunkSize)
+                        while (currentChunkSize < currentChunkFinalSize)
                         {
-                            int currentBufferSize = 0;
+                            int currentBufferSize = GetCurrentBufferSize(currentChunkSize, currentChunkFinalSize);
 
                             byte[] currentBuffer = new byte[currentBufferSize];
                             await readStream.ReadAsync(currentBuffer, 0, currentBufferSize);
@@ -61,17 +63,17 @@ namespace FileSplitter.Splitter
 
                             currentChunkSize += currentBufferSize;
 
-                            if (currentChunkSize == chunkSize)
+                            if (currentChunkSize == currentChunkFinalSize)
                             {
                                 await writeStream.FlushAsync();
                                 await writeStream.DisposeAsync();
-                                totalChunksSize += chunkSize;
+                                totalChunksSize += currentChunkFinalSize;
                                 CreatedFiles.Add(chunkFileName);
                             }
                         }
                     }
-                    if (originalSize - totalChunksSize > 0 && originalSize - totalChunksSize < chunkSize)
-                        chunkSize = originalSize - totalChunksSize;
+                    if (originalSize - totalChunksSize > 0 && originalSize - totalChunksSize < currentChunkFinalSize)
+                        currentChunkFinalSize = originalSize - totalChunksSize;
                 }
             }
 

@@ -42,5 +42,18 @@ namespace FileSplitter.Splitter
 
         protected internal static string GetChunkFileName(FileInfo fileInfo, int chunkNumber) =>
             $"{fileInfo.DirectoryName}{Path.DirectorySeparatorChar}{fileInfo.Name}.part_{chunkNumber}";
+
+        protected internal int GetCurrentBufferSize(long currentChunkSize, long chunkSize)
+        {
+            if (currentChunkSize + BufferSize <= chunkSize)
+                return BufferSize;
+            else
+            {
+                if (BufferSize > chunkSize)
+                    return (int)chunkSize;
+                else
+                    return (int)(chunkSize - currentChunkSize);
+            }
+        }
     }
 }

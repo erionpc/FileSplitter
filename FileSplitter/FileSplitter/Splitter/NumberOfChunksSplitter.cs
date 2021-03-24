@@ -46,7 +46,7 @@ namespace FileSplitter.Splitter
                         long currentChunkSize = 0;
                         while (currentChunkSize < chunkSize)
                         {
-                            int currentBufferSize = GetCurrentBufferSize(currentChunkSize, chunkSize);                            
+                            int currentBufferSize = GetCurrentBufferSize(currentChunkSize, chunkSize);
 
                             byte[] currentBuffer = new byte[currentBufferSize];
                             await readStream.ReadAsync(currentBuffer, 0, currentBufferSize);
@@ -70,19 +70,6 @@ namespace FileSplitter.Splitter
 
             if (originalSize - totalChunksSize != 0)
                 throw new FileSplitException($"File not split correctly! Difference in bytes: { originalSize - totalChunksSize }");
-        }
-
-        private int GetCurrentBufferSize(long currentChunkSize, long chunkSize)
-        {
-            if (currentChunkSize + BufferSize <= chunkSize)
-                return BufferSize;
-            else
-            {
-                if (BufferSize > chunkSize)
-                    return (int)chunkSize;
-                else
-                    return (int)(chunkSize - currentChunkSize);
-            }
         }
     }
 }
