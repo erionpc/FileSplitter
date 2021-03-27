@@ -2,7 +2,7 @@
   "profiles": {
     "FileSplitter": {
       "commandName": "Project",
-      "commandLineArgs": "/f C:\\Users\\Lenovo\\source\\repos\\erionpc\\FileSplitter\\FileSplitter\\Tests\\testA.txt /s 50000"
+      "commandLineArgs": "/m /p \"C:\\Users\\Lenovo\\source\\repos\\erionpc\\FileSplitter\\FileSplitter\\Tests\\testA.txt.part_1\" \"C:\\Users\\Lenovo\\source\\repos\\erionpc\\FileSplitter\\FileSplitter\\Tests\\testA.txt.part_2\" \"C:\\Users\\Lenovo\\source\\repos\\erionpc\\FileSplitter\\FileSplitter\\Tests\\testA.txt.part_3\" /d C:\\Users\\Lenovo\\source\\repos\\erionpc\\FileSplitter\\FileSplitter\\Tests\\testA_merged.txt"
     }
   }
 }

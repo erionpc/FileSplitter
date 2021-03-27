@@ -1,4 +1,6 @@
-﻿using FileSplitter.Splitter;
+﻿using FileSplitter.Enums;
+using FileSplitter.FileMerger;
+using FileSplitter.Splitter;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,15 +13,14 @@ namespace FileSplitter
     public class App
     {
         private readonly IConfiguration _config;
-        private readonly ISplitter _numberOfChunksSplitter;
-        private readonly ISplitter _sizeOfChunksSplitter;
         private readonly IArgumentParser _argumentParser;
 
-        public App(IConfiguration config, IArgumentParser argParser, IEnumerable<ISplitter> splitters)
+        private ISplitter _fileSplitter;
+        private IMerger _fileMerger;
+
+        public App(IConfiguration config, IArgumentParser argParser)
         {
             _config = config;
-            _numberOfChunksSplitter = splitters.FirstOrDefault(x => x.TypeOfSplitter == SplitterType.NumberOfChunksSplitter);
-            _sizeOfChunksSplitter = splitters.FirstOrDefault(x => x.TypeOfSplitter == SplitterType.SizeOfChunksSplitter);
             _argumentParser = argParser;
         }
 
@@ -28,28 +29,22 @@ namespace FileSplitter
             try
             {
                 _argumentParser.Arguments = args;
-                var fileSplitInfo = _argumentParser.BuildFileSplitInfo();
+                var operation = _argumentParser.GetOperation();
 
-                if (_argumentParser.InfoRequestReceived())
+                switch(operation)
                 {
-                    Console.WriteLine($"{Environment.NewLine}Supported syntax:{Environment.NewLine}{PrintOptions()}");
-                }
-                else
-                {
-                    Console.WriteLine($"{fileSplitInfo}{Environment.NewLine}" +
-                                      $"Splitting file...");
+                    case OperationOptionsEnum.Info:
+                    default:
+                        Console.WriteLine($"{Environment.NewLine}Supported syntax:{Environment.NewLine}{PrintOptions()}");
+                        break;
 
-                    ISplitter splitter = null;
-                    if (fileSplitInfo.NumberOfChunks > 0)
-                        splitter = _numberOfChunksSplitter;
-                    else if (fileSplitInfo.ChunkSize > 0)
-                        splitter = _sizeOfChunksSplitter;
+                    case OperationOptionsEnum.Split:
+                        await FileSplit();
+                        break;
 
-                    splitter.FileSplittingInfo = fileSplitInfo;
-                    await splitter.Split();
-
-                    Console.WriteLine($"Created files:{Environment.NewLine}" +
-                                      $"{string.Join(Environment.NewLine, splitter.CreatedFiles)}");
+                    case OperationOptionsEnum.Merge:
+                        await FileMerge();
+                        break;
                 }
             }
             catch (FileSplitException ex)
@@ -63,12 +58,61 @@ namespace FileSplitter
             }
         }
 
+        private async Task FileSplit()
+        {
+            var fileSplitInfo = _argumentParser.BuildFileSplitInfo();
+
+            Console.WriteLine($"{fileSplitInfo}{Environment.NewLine}" +
+                          $"Splitting file...");
+
+            if (fileSplitInfo.NumberOfChunks > 0)
+                _fileSplitter = new NumberOfChunksSplitter(_config);
+            else if (fileSplitInfo.ChunkSize > 0)
+                _fileSplitter = new SizeOfChunksSplitter(_config);
+
+            _fileSplitter.FileSplittingInfo = fileSplitInfo;
+            await _fileSplitter.Split();
+
+            Console.WriteLine($"Created files:{Environment.NewLine}" +
+                              $"{string.Join(Environment.NewLine, _fileSplitter.CreatedFiles)}");
+        }
+
+        private async Task FileMerge()
+        {
+            var fileMergeInfo = _argumentParser.BuildFileMergeInfo();
+
+            Console.WriteLine($"{fileMergeInfo}{Environment.NewLine}" +
+                          $"Merging files...");
+
+            _fileMerger = new Merger(_config)
+            {
+                FileMergingInfo = fileMergeInfo
+            };
+            await _fileMerger.MergeFiles();
+
+            Console.WriteLine($"Files merged into: {fileMergeInfo.DestinationFile}");
+        }
+
         private static string PrintOptions()
         {
-            string options = "";
-            foreach (SwitchEnum switchOption in Enum.GetValues(typeof(SwitchEnum)))
+            string options = $"Operation options: {Environment.NewLine}";
+            foreach (OperationOptionsEnum option in Enum.GetValues(typeof(OperationOptionsEnum)))
             {
-                var argumentInfo = switchOption.GetAttribute<ArgumentInfo>();
+                var argumentInfo = option.GetAttribute<ArgumentInfo>();
+                options += $"{Environment.NewLine}{argumentInfo.ArgumentSwitch} = {argumentInfo.ArgumentDescription}";
+            }
+
+            options += $"{Environment.NewLine}{Environment.NewLine}Split options: {Environment.NewLine}";
+            foreach (SplitOptionsEnum option in Enum.GetValues(typeof(SplitOptionsEnum)))
+            {
+                var argumentInfo = option.GetAttribute<ArgumentInfo>();
+                options += $"{Environment.NewLine}{argumentInfo.ArgumentSwitch} = {argumentInfo.ArgumentDescription}";
+            }
+
+            options += $"{Environment.NewLine}{Environment.NewLine}Merge options: {Environment.NewLine}";
+            foreach (MergeOptionsEnum option in Enum.GetValues(typeof(MergeOptionsEnum)))
+            {
+                var argumentInfo = option.GetAttribute<ArgumentInfo>();
                 options += $"{Environment.NewLine}{argumentInfo.ArgumentSwitch} = {argumentInfo.ArgumentDescription}";
             }
 

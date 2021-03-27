@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileSplitter.Merger
+namespace FileSplitter.FileMerger
 {
     public interface IMerger
     {
-        void MergeFiles(IEnumerable<string> fileChunks, string destinationFile);
+        FileMergeInfo FileMergingInfo { get; set; }
+
+        Task MergeFiles();
     }
 }
