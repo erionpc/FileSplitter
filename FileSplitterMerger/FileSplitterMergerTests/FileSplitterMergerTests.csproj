@@ -27,9 +27,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestFiles\testA.txt" />
-    <EmbeddedResource Include="TestFiles\testB.txt" />
-    <EmbeddedResource Include="TestFiles\testC.txt" />
+    <Content Include="TestFiles\testA.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\testB.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\testC.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

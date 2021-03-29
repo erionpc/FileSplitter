@@ -24,7 +24,7 @@ namespace FileSplitterMergerTests.SplitterMergerTests
             yield return new object[]
             {
                 "test A 3 chunks",
-                new FileSplitInfo(@"C:\Users\Lenovo\source\repos\erionpc\FileSplitter\FileSplitterMerger\FileSplitterMergerTests\TestFiles\testA.txt", 3),
+                new FileSplitInfo($@"{AssemblyDirectory}\TestFiles\testA.txt", 3),
                 null
             };
         }
