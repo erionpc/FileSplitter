@@ -17,6 +17,7 @@ namespace FileSplitterMerger.Splitter
         {
             var fileInfo = new FileInfo(FileSplittingInfo.FilePath);
             long originalSize = fileInfo.Length;
+
             long chunkSize = (long)Math.Ceiling((double)fileInfo.Length / FileSplittingInfo.NumberOfChunks);
             long totalChunksSize = 0;
             
@@ -29,7 +30,7 @@ namespace FileSplitterMerger.Splitter
             {
                 for (int i = 0; i < FileSplittingInfo.NumberOfChunks; i++)
                 {
-                    string chunkFileName = GetChunkFileName(fileInfo, i + 1);
+                    string chunkFileName = GetChunkFileName(fileInfo.Name, FileSplittingInfo.DestinationPath, i + 1);
                     using (var writeStream = new FileStream(chunkFileName,
                                                             FileMode.Create,
                                                             FileAccess.Write,
@@ -42,6 +43,13 @@ namespace FileSplitterMerger.Splitter
 
                         if (!writeStream.CanWrite)
                             throw new FileSplitterMergerException($"Can't write to path: '{chunkFileName}'");
+
+                        if (totalChunksSize == originalSize)
+                        {
+                            // create empty file when all the bytes of the original file have been written (should just be one in edge cases)
+                            await writeStream.WriteAsync(new ReadOnlyMemory<byte>());
+                            continue;
+                        }
 
                         long currentChunkSize = 0;
                         while (currentChunkSize < chunkSize)

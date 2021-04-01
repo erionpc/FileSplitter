@@ -19,7 +19,7 @@ namespace FileSplitterMerger.Splitter
             long originalSize = fileInfo.Length;
             
             if (FileSplittingInfo.ChunkSize > originalSize)
-                throw new FileSplitterMergerException($"The file size is smaller than the requested chunk size: {originalSize} B");
+                throw new FileSplitterMergerException($"The file size is smaller than the requested chunk size: {originalSize}B");
 
             if (FileSplittingInfo.ChunkSize == originalSize)
                 return;
@@ -37,7 +37,7 @@ namespace FileSplitterMerger.Splitter
             {
                 for (int i = 0; i < numberOfChunks; i++)
                 {
-                    string chunkFileName = GetChunkFileName(fileInfo, i + 1);
+                    string chunkFileName = GetChunkFileName(fileInfo.Name, FileSplittingInfo.DestinationPath, i + 1);
 
                     using (var writeStream = new FileStream(chunkFileName,
                                                             FileMode.Create,

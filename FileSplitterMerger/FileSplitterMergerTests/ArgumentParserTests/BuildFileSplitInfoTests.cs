@@ -14,87 +14,105 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
 {
     public class BuildFileSplitInfoTests
     {
-        static readonly ArgumentInfo _split_filePathArgument = SplitOptionsEnum.FilePath.GetAttribute<ArgumentInfo>();
-        static readonly ArgumentInfo _split_numberOfChunksArgument = SplitOptionsEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
-        static readonly ArgumentInfo _split_chunkSizeArgument = SplitOptionsEnum.ChunkSize.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _splitArgument = OperationOptionsEnum.Split.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _filePathArgument = SplitOptionsEnum.FilePath.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _destinationPathArgument = SplitOptionsEnum.DestinationPath.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _numberOfChunksArgument = SplitOptionsEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
+        static readonly ArgumentInfo _chunkSizeArgument = SplitOptionsEnum.ChunkSize.GetAttribute<ArgumentInfo>();
 
         public static IEnumerable<object[]> BuildFileSplitInfo_TestData() 
         {
             string filePath = @"C:\filepath\file.txt";
+            string destinationPath = @"C:\filepath";
+
             yield return new object[] 
             { 
-                "test with /s /f and /n", 
-                new string[] { "/s", "/f", filePath, "/n", "3" },
-                new FileSplitInfo(filePath, 3),
+                "test with correct number of chunks splitting options", 
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _numberOfChunksArgument.ArgumentSwitch, "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
+                new FileSplitInfo(filePath, 3, destinationPath),
                 null
             };
             yield return new object[]
             {
-                "test with /s, /f and /s",
-                new string[] { "/s", "/f", filePath, "/s", "3" },
-                new FileSplitInfo(filePath, (long)3),
+                "test with correct size of chunks splitting options",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _destinationPathArgument.ArgumentSwitch, destinationPath, _chunkSizeArgument.ArgumentSwitch, "3" },
+                new FileSplitInfo(filePath, destinationPath, 3),
                 null
             };
             yield return new object[]
             {
-                "test with only /s and /f",
-                new string[] { "/s", "/f", filePath },
+                "test with no splitting type option",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
-                new FileSplitterMergerException($"Please specify either {_split_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_split_chunkSizeArgument.ArgumentDescription.ToLower()}")
+                new FileSplitterMergerException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
             };
             yield return new object[]
             {
-                "test with /s, /f, /n and /s",
-                new string[] { "/s", "/f", filePath, "/n", "3", "/s", "3"  },
+                "test with both splitting type options",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _numberOfChunksArgument.ArgumentSwitch, "3", _chunkSizeArgument.ArgumentSwitch, "3", _destinationPathArgument.ArgumentSwitch, destinationPath  },
                 null,
-                new FileSplitterMergerException($"Please specify either {_split_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_split_chunkSizeArgument.ArgumentDescription.ToLower()}")
+                new FileSplitterMergerException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
             };
             yield return new object[]
             {
-                "test with /s, /f and /n 0",
-                new string[] { "/s", "/f", filePath, "/n", "0" },
+                "test with number of chunks option and value zero",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _numberOfChunksArgument.ArgumentSwitch, "0", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
-                new FileSplitterMergerException($"Please specify either {_split_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_split_chunkSizeArgument.ArgumentDescription.ToLower()}")
+                new FileSplitterMergerException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
             };
             yield return new object[]
             {
-                "test with only /s and /n",
-                new string[] { "/s", "/n", "3" },
+                "test without file path argument and number of chunks option",
+                new string[] { _splitArgument.ArgumentSwitch, _numberOfChunksArgument.ArgumentSwitch, "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
-                new FileSplitterMergerException($"{_split_filePathArgument.ArgumentDescription} not specified")
+                new FileSplitterMergerException($"{_filePathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
-                "test with only /s and /s",
-                new string[] { "/s", "/s", "3" },
+                "test without file path argument and size of chunks option",
+                new string[] { _splitArgument.ArgumentSwitch, _chunkSizeArgument.ArgumentSwitch, "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
-                new FileSplitterMergerException($"{_split_filePathArgument.ArgumentDescription} not specified")
+                new FileSplitterMergerException($"{_filePathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
-                "test with /s, /f and /a",
-                new string[] { "/s", "/f", filePath, "/a", "3" },
+                "test without destination path argument",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _numberOfChunksArgument.ArgumentSwitch, "3" },
+                null,
+                new FileSplitterMergerException($"{_destinationPathArgument.ArgumentDescription} not specified")
+            };
+            yield return new object[]
+            {
+                "test with unknown option",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, "/a", "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
                 new FileSplitterMergerException($"Unrecognised split option: /a")
             };
             yield return new object[]
             {
-                "test with /s, /f and /n without filename",
-                new string[] { "/s", "/f", "/n", "3" },
+                "test without a file name value",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, _numberOfChunksArgument.ArgumentSwitch, "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
-                new FileSplitterMergerException($"{_split_filePathArgument.ArgumentDescription} not specified")
+                new FileSplitterMergerException($"{_filePathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
-                "test with /s, /f and /n without value",
-                new string[] { "/s", "/f", filePath, "/n" },
+                "test without a destination path value",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _destinationPathArgument.ArgumentSwitch, _numberOfChunksArgument.ArgumentSwitch, "3" },
                 null,
-                new FileSplitterMergerException($"No value supplied for /n")
+                new FileSplitterMergerException($"{_destinationPathArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
-                "test with /s, /f and 2 /n",
-                new string[] { "/s", "/f", filePath, "/n", "3", "/n", "3" },
+                "test without number of chunks value",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _numberOfChunksArgument.ArgumentSwitch, _destinationPathArgument.ArgumentSwitch, destinationPath },
+                null,
+                new FileSplitterMergerException($"Please specify either {_numberOfChunksArgument.ArgumentDescription.ToLower()} or {_chunkSizeArgument.ArgumentDescription.ToLower()}")
+            };
+            yield return new object[]
+            {
+                "test with duplicated valid options",
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, _numberOfChunksArgument.ArgumentSwitch, "3", _numberOfChunksArgument.ArgumentSwitch, "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
                 new FileSplitterMergerException($"Duplicated options")
             };
@@ -106,7 +124,7 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
         {
             try
             {
-                var argumentParser = new ArgumentParser
+                var argumentParser = new ArgumentParser()
                 {
                     Arguments = arguments
                 };

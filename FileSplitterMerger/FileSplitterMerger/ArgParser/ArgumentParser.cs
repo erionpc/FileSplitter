@@ -71,10 +71,11 @@ namespace FileSplitterMerger.ArgParser
             FileSplitInfo fileSplitInfo = null;
 
             ArgumentInfo filePathArgument = SplitOptionsEnum.FilePath.GetAttribute<ArgumentInfo>();
+            ArgumentInfo destinationPathArgument = SplitOptionsEnum.DestinationPath.GetAttribute<ArgumentInfo>();
             ArgumentInfo numberOfChunksArgument = SplitOptionsEnum.NumberOfChunks.GetAttribute<ArgumentInfo>();
             ArgumentInfo chunkSizeArgument = SplitOptionsEnum.ChunkSize.GetAttribute<ArgumentInfo>();
 
-            var recognisedSwitches = new List<ArgumentInfo>() { filePathArgument, numberOfChunksArgument, chunkSizeArgument };
+            var recognisedSwitches = new List<ArgumentInfo>() { filePathArgument, destinationPathArgument, numberOfChunksArgument, chunkSizeArgument };
 
             var switchesInArgs = Arguments.Where(a => a.StartsWith("/")).Skip(1).ToList();
             var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
@@ -89,6 +90,10 @@ namespace FileSplitterMerger.ArgParser
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new FileSplitterMergerException($"{filePathArgument.ArgumentDescription} not specified");
 
+            string destinationPath = GetArgument(destinationPathArgument.ArgumentSwitch);
+            if (string.IsNullOrWhiteSpace(destinationPath))
+                throw new FileSplitterMergerException($"{destinationPathArgument.ArgumentDescription} not specified");
+
             string numberOfChunksString = GetArgument(numberOfChunksArgument.ArgumentSwitch);
             bool numberOfChunksSpecified = int.TryParse(numberOfChunksString, out int numberOfChunks);
 
@@ -101,9 +106,9 @@ namespace FileSplitterMerger.ArgParser
                 throw new FileSplitterMergerException($"Please specify either {numberOfChunksArgument.ArgumentDescription.ToLower()} or {chunkSizeArgument.ArgumentDescription.ToLower()}");
 
             if (numberOfChunks > 0)
-                fileSplitInfo = new FileSplitInfo(filePath, numberOfChunks);
+                fileSplitInfo = new FileSplitInfo(filePath, numberOfChunks, destinationPath);
             else if (chunkSize > 0)
-                fileSplitInfo = new FileSplitInfo(filePath, chunkSize);
+                fileSplitInfo = new FileSplitInfo(filePath, destinationPath, chunkSize);
 
             return fileSplitInfo;
         }

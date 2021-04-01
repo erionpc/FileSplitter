@@ -40,8 +40,8 @@ namespace FileSplitterMerger.Splitter
 
         abstract public Task Split();
 
-        protected internal static string GetChunkFileName(FileInfo fileInfo, int chunkNumber) =>
-            $"{fileInfo.DirectoryName}{Path.DirectorySeparatorChar}{fileInfo.Name}.part_{chunkNumber}";
+        protected internal static string GetChunkFileName(string fileName, string path, int chunkNumber) =>
+            $"{path}{Path.DirectorySeparatorChar}{fileName}.part_{chunkNumber}";
 
         protected internal int GetCurrentBufferSize(long currentChunkSize, long chunkSize)
         {
