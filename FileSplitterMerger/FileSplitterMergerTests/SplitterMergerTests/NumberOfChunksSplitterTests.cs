@@ -22,13 +22,13 @@ namespace FileSplitterMergerTests.SplitterMergerTests
 
         public static IEnumerable<object[]> NumberOfChunksSplitter_TestData()
         {
-            FileInfo fileInfoA = new FileInfo($@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testA.txt");
-            FileInfo fileInfoB = new FileInfo($@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testB.txt");
-            FileInfo fileInfoC = new FileInfo($@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testC.txt");
-
             File.Copy($@"{AssemblyDirectory}\TestFiles\testA.txt", $@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testA.txt", true);
             File.Copy($@"{AssemblyDirectory}\TestFiles\testB.txt", $@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testB.txt", true);
             File.Copy($@"{AssemblyDirectory}\TestFiles\testC.txt", $@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testC.txt", true);
+
+            FileInfo fileInfoA = new FileInfo($@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testA.txt");
+            FileInfo fileInfoB = new FileInfo($@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testB.txt");
+            FileInfo fileInfoC = new FileInfo($@"{AssemblyDirectory}\TestFiles\NumberOfChunksSplitterTests_testFile_testC.txt");
 
             string destinationPath = $@"{AssemblyDirectory}\TestFiles";
 
