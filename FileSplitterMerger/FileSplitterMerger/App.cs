@@ -36,7 +36,7 @@ namespace FileSplitterMerger
                 {
                     case OperationOptionsEnum.Info:
                     default:
-                        Console.WriteLine($"{Environment.NewLine}Supported syntax:{Environment.NewLine}{PrintOptions()}");
+                        Console.WriteLine($"{Environment.NewLine}Supported syntax:{Environment.NewLine}{Environment.NewLine}{PrintOptions()}");
                         break;
 
                     case OperationOptionsEnum.Split:
@@ -110,7 +110,7 @@ namespace FileSplitterMerger
                 options += $"{Environment.NewLine}{argumentInfo.ArgumentSwitch} = {argumentInfo.ArgumentDescription}";
             }
 
-            options += $"{Environment.NewLine}{Environment.NewLine}Merge options: {Environment.NewLine}";
+            options += $"{Environment.NewLine}{Environment.NewLine}Merge options:";
             foreach (MergeOptionsEnum option in Enum.GetValues(typeof(MergeOptionsEnum)))
             {
                 var argumentInfo = option.GetAttribute<ArgumentInfo>();

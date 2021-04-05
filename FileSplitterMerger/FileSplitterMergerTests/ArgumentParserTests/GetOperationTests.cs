@@ -51,7 +51,7 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
             yield return new object[]
             {
                 "test with unknown operation argument",
-                new string[] { "/p" },
+                new string[] { "-p" },
                 null,
                 new FileSplitterMergerException($"Unrecognised operation. The first argument needs to be one of the following:{Environment.NewLine}" +
                     string.Join(", ", Enum.GetValues(typeof(OperationOptionsEnum)).Cast<OperationOptionsEnum>().Select(x => x.GetAttribute<ArgumentInfo>().ArgumentSwitch)))

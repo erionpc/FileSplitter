@@ -84,9 +84,9 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
             yield return new object[]
             {
                 "test with unknown option",
-                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, "/a", "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
+                new string[] { _splitArgument.ArgumentSwitch, _filePathArgument.ArgumentSwitch, filePath, "-a", "3", _destinationPathArgument.ArgumentSwitch, destinationPath },
                 null,
-                new FileSplitterMergerException($"Unrecognised split option: /a")
+                new FileSplitterMergerException($"Unrecognised split option: -a")
             };
             yield return new object[]
             {

@@ -43,18 +43,18 @@ namespace FileSplitterMerger.ArgParser
                     if (i + 1 == Arguments.Length)
                         throw new FileSplitterMergerException($"No value supplied for {argSwitch}");
 
-                    if (!Arguments[i + 1].StartsWith("/"))
+                    if (!Arguments[i + 1].StartsWith("-"))
                     {
                         argValue = Arguments[i + 1].Replace("\"", "");
                         argValueFound = true;
 
-                        if (i + 2 < Arguments.Length && !Arguments[i + 2].StartsWith("/"))
+                        if (i + 2 < Arguments.Length && !Arguments[i + 2].StartsWith("-"))
                             moreValuesForArgument = true;
                     }
                 }
                 else if (moreValuesForArgument && i + 1 < Arguments.Length)
                 {
-                    if (!Arguments[i + 1].StartsWith("/"))
+                    if (!Arguments[i + 1].StartsWith("-"))
                         argValue += ", " + Arguments[i + 1].Replace(",", "");
                     else
                         moreValuesForArgument = false;
@@ -77,7 +77,7 @@ namespace FileSplitterMerger.ArgParser
 
             var recognisedSwitches = new List<ArgumentInfo>() { filePathArgument, destinationPathArgument, numberOfChunksArgument, chunkSizeArgument };
 
-            var switchesInArgs = Arguments.Where(a => a.StartsWith("/")).Skip(1).ToList();
+            var switchesInArgs = Arguments.Where(a => a.StartsWith("-")).Skip(1).ToList();
             var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
 
             if (recognisedSwitchesInArgs.Count != switchesInArgs.Count)
@@ -120,7 +120,7 @@ namespace FileSplitterMerger.ArgParser
 
             var recognisedSwitches = new List<ArgumentInfo>() { filePartsArgument, destinationFilePathArgument };
 
-            var switchesInArgs = Arguments.Where(a => a.StartsWith("/")).Skip(1).ToList();
+            var switchesInArgs = Arguments.Where(a => a.StartsWith("-")).Skip(1).ToList();
             var recognisedSwitchesInArgs = switchesInArgs.Where(a => recognisedSwitches.Select(x => x.ArgumentSwitch).Contains(a)).ToList();
 
             if (recognisedSwitchesInArgs.Count != switchesInArgs.Count)

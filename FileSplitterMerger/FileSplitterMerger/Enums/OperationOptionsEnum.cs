@@ -4,11 +4,11 @@ namespace FileSplitterMerger.Enums
 {
     public enum OperationOptionsEnum
     {
-        [ArgumentInfo("/s", "File split")]
+        [ArgumentInfo("-s", "File split")]
         Split,
-        [ArgumentInfo("/m", "File merge")]
+        [ArgumentInfo("-m", "File merge")]
         Merge,
-        [ArgumentInfo("/i", "Syntax info")]
+        [ArgumentInfo("-i", "Syntax info")]
         Info
     }
 }

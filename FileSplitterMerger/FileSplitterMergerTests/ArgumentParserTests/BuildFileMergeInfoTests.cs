@@ -74,14 +74,14 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
             yield return new object[]
             {
                 "test with unknown merge option",
-                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, "/a", "3" },
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, "-a", "3" },
                 null,
-                new FileSplitterMergerException($"Unrecognised merge option: /a")
+                new FileSplitterMergerException($"Unrecognised merge option: -a")
             };
             yield return new object[]
             {
                 "test with duplicated arguments",
-                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, "/p", filePart1, "/p", filePart2 },
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, _merge_filePartsArgument.ArgumentSwitch, filePart1, _merge_filePartsArgument.ArgumentSwitch, filePart2 },
                 null,
                 new FileSplitterMergerException($"Duplicated options")
             };
