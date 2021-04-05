@@ -55,5 +55,6 @@ namespace FileSplitterMerger.Splitter
                     return (int)(chunkSize - currentChunkSize);
             }
         }
+        // Todo: change argument switch character to '-'
     }
 }

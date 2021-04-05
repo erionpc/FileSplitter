@@ -114,8 +114,6 @@ namespace FileSplitterMergerTests.SplitterMergerTests
                     File.Delete(file.FullName);
                 }
             }
-
-            // Todo: Implement Merger tests
         }
     }
 }

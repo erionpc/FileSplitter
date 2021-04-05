@@ -38,7 +38,7 @@ namespace FileSplitterMerger.Merger
             if (!FileMergingInfo.FileParts?.Any() ?? true)
                 throw new FileSplitterMergerException("No file parts provided");
 
-            var filePartsInfo = FileMergingInfo.FileParts.Select(x => new FileInfo(x));
+            var filePartsInfo = FileMergingInfo.FileParts.Select(x => new FileInfo(x)).ToList();
 
             if (filePartsInfo.Any(x => !x.Exists))
                 throw new FileSplitterMergerException($"The following files don't exist: {string.Join(", ", filePartsInfo.Where(x => !x.Exists))}");
@@ -49,6 +49,12 @@ namespace FileSplitterMerger.Merger
 
             if (File.Exists(FileMergingInfo.DestinationFile))
                 File.Delete(FileMergingInfo.DestinationFile);
+
+            if (FileMergingInfo.FileParts.Count() == 1)
+            {
+                File.Copy(FileMergingInfo.FileParts.First(), FileMergingInfo.DestinationFile);
+                return;
+            }
 
             using (var writeStream = new FileStream(FileMergingInfo.DestinationFile,
                                                     FileMode.Append,
@@ -112,7 +118,5 @@ namespace FileSplitterMerger.Merger
                     return (int)(chunkSize - currentChunkSize);
             }
         }
-
-        // Todo: Finish implementing merger
     }
 }

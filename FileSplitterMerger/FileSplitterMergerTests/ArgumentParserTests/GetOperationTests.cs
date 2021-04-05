@@ -22,35 +22,35 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
         {
             yield return new object[]
             {
-                "test with /s",
-                new string[] { "/s" },
+                "test with split argument",
+                new string[] { _operation_splitArgument.ArgumentSwitch },
                 OperationOptionsEnum.Split,
                 null
             };
             yield return new object[]
             {
-                "test with /S",
-                new string[] { "/S" },
+                "test with split argument uppercase",
+                new string[] { _operation_splitArgument.ArgumentSwitch.ToUpper() },
                 OperationOptionsEnum.Split,
                 null
             };
             yield return new object[]
             {
-                "test with /m",
-                new string[] { "/m" },
+                "test with merge argument",
+                new string[] { _operation_mergeArgument.ArgumentSwitch },
                 OperationOptionsEnum.Merge,
                 null
             };
             yield return new object[]
             {
-                "test with /M",
-                new string[] { "/M" },
+                "test with merge argument uppercase",
+                new string[] { _operation_mergeArgument.ArgumentSwitch.ToUpper() },
                 OperationOptionsEnum.Merge,
                 null
             };
             yield return new object[]
             {
-                "test with /p",
+                "test with unknown operation argument",
                 new string[] { "/p" },
                 null,
                 new FileSplitterMergerException($"Unrecognised operation. The first argument needs to be one of the following:{Environment.NewLine}" +
@@ -79,9 +79,5 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
                 Assert.Equal(expectedException.Message, ex.Message);
             }
         }
-
-        // Todo: Add unit tests for NumberOfChunkSplitter
-        // Todo: Add unit tests for SizeOfChunkSplitter
-        // Todo: Add unit tests for Merger
     }
 }

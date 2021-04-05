@@ -10,6 +10,7 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
 {
     public class BuildFileMergeInfoTests
     {
+        static readonly ArgumentInfo _mergeOperation = OperationOptionsEnum.Merge.GetAttribute<ArgumentInfo>();
         static readonly ArgumentInfo _merge_destinationFileArgument = MergeOptionsEnum.DestinationFilePath.GetAttribute<ArgumentInfo>();
         static readonly ArgumentInfo _merge_filePartsArgument = MergeOptionsEnum.FileParts.GetAttribute<ArgumentInfo>();
 
@@ -23,64 +24,64 @@ namespace FileSplitterMerger.Tests.ArgumentParserTests
 
             yield return new object[]
             {
-                "test with /m, /d and /p",
-                new string[] { "/m", "/d", filePath, "/p", filePart1, filePart2, filePart3 },
+                "test with correct merge options: 3 file parts",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, _merge_filePartsArgument.ArgumentSwitch, filePart1, filePart2, filePart3 },
                 new FileMergeInfo(new[] { filePart1, filePart2, filePart3 }, filePath),
                 null
             };
             yield return new object[]
             {
-                "test with /m, /p and /d",
-                new string[] { "/m", "/p", filePart1, filePart2, filePart3, "/d", filePath },
+                "test with correct merge options: 3 file parts in the middle of the arguments",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_filePartsArgument.ArgumentSwitch, filePart1, filePart2, filePart3, _merge_destinationFileArgument.ArgumentSwitch, filePath },
                 new FileMergeInfo(new[] { filePart1, filePart2, filePart3 }, filePath),
                 null
             };
             yield return new object[]
             {
-                "test with /m, /p and /d with double quotes",
-                new string[] { "/m", "/p", filePart1, $"\"{filePart2}\"", filePart3, "/d", filePath },
+                "test with correct merge options and double quotes for one of the paths",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_filePartsArgument.ArgumentSwitch, filePart1, $"\"{filePart2}\"", filePart3, _merge_destinationFileArgument.ArgumentSwitch, filePath },
                 new FileMergeInfo(new[] { filePart1, filePart2, filePart3 }, filePath),
                 null
             };
             yield return new object[]
             {
-                "test with /m, /p and /d with spaces in path in last file part",
-                new string[] { "/m", "/p", filePart1, $"\"{filePart2}\"", filePart3, filePart4WithSpaces, "/d", filePath },
+                "test with correct merge options and spaces in path in last file part",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_filePartsArgument.ArgumentSwitch, filePart1, $"\"{filePart2}\"", filePart3, filePart4WithSpaces, _merge_destinationFileArgument.ArgumentSwitch, filePath },
                 new FileMergeInfo(new[] { filePart1, filePart2, filePart3, filePart4WithSpaces }, filePath),
                 null
             };
             yield return new object[]
             {
-                "test with /m, /p and /d with spaces in path",
-                new string[] { "/m", "/p", filePart1, $"\"{filePart2}\"", filePart4WithSpaces, filePart3, "/d", filePath },
+                "test with correct merge options and paths with spaces and double quotes in the middle of the arguments",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_filePartsArgument.ArgumentSwitch, filePart1, $"\"{filePart2}\"", filePart4WithSpaces, filePart3, _merge_destinationFileArgument.ArgumentSwitch, filePath },
                 new FileMergeInfo(new[] { filePart1, filePart2, filePart4WithSpaces, filePart3 }, filePath),
                 null
             };
             yield return new object[]
             {
-                "test with only /m and /d",
-                new string[] { "/m", "/d", filePath },
+                "test with missing file parts argument",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath },
                 null,
                 new FileSplitterMergerException($"{_merge_filePartsArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
-                "test with only /m and /p",
-                new string[] { "/m", "/p", filePart1 },
+                "test with only missing destinatino file argument",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_filePartsArgument.ArgumentSwitch, filePart1 },
                 null,
                 new FileSplitterMergerException($"{_merge_destinationFileArgument.ArgumentDescription} not specified")
             };
             yield return new object[]
             {
-                "test with /m, /d and /a",
-                new string[] { "/m", "/d", filePath, "/a", "3" },
+                "test with unknown merge option",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, "/a", "3" },
                 null,
                 new FileSplitterMergerException($"Unrecognised merge option: /a")
             };
             yield return new object[]
             {
-                "test with /m, /d and 2 /p",
-                new string[] { "/m", "/d", filePath, "/p", filePart1, "/p", filePart2 },
+                "test with duplicated arguments",
+                new string[] { _mergeOperation.ArgumentSwitch, _merge_destinationFileArgument.ArgumentSwitch, filePath, "/p", filePart1, "/p", filePart2 },
                 null,
                 new FileSplitterMergerException($"Duplicated options")
             };
