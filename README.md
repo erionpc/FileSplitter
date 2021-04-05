@@ -35,7 +35,7 @@ The beauty of .NET 5 is it's multi-platform, so you can run this app on Linux by
 `dotnet publish -c release -r ubuntu.16.04-x64 --self-contained --output <destination folder>`
 <br>
 ### Run on Linux:
-`dotnet FileSplitterMerger.dll <see examples above for the arguments>`
+`dotnet FileSplitterMerger.dll <arguments: see examples above for the arguments>`
 <br><br>
 ## Implementation notes
 The files aren't loaded in memory but they're read and written using streams and buffers. This means that the memory fingerprint of this application is minimal and it can handle files of any size.<br>
