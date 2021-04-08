@@ -3,6 +3,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <Authors>erionpc</Authors>
+    <Description>A file splitter and merger based on .NET Core 5 which can handle very big files with memory optimisation.</Description>
+    <RepositoryUrl>https://github.com/erionpc/FileSplitter.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageProjectUrl>https://github.com/erionpc/FileSplitter</PackageProjectUrl>
+    <PackageReleaseNotes>04/2021</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
