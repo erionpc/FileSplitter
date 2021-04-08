@@ -7,16 +7,16 @@
 ## Operation options:
 -s = File split<br>
 -m = File merge<br>
--i = Syntax info<br>
-<br>
+-i = Syntax info
+<br><br>
 ## Split options:
 -f = File path<br>
 -d = Destination path<br>
 -n = Split in number of chunks<br>
--s = Split in chunks of size in bytes<br>
-<br>
+-s = Split in chunks of size in bytes
+<br><br>
 ## Merge options:
--p = File parts
+-p = File parts<br>
 -d = Destination file path
 <br><br>
 ## Examples:
