@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -16,15 +17,38 @@ namespace FileSplitterMerger.Splitter
 
         public List<string> CreatedFiles { get; protected internal set; } = new List<string>();
 
+        private int _bufferSize;
+
         internal int BufferSize
         {
             get
             {
-                int defaultSize = Configuration.GetValue<int>("SplitterConfig:Buffersize");
-                if (FileSplittingInfo.ChunkSize > 0 && FileSplittingInfo.ChunkSize < defaultSize)
-                    return (int)FileSplittingInfo.ChunkSize;
-                else
-                    return defaultSize;
+                if (_bufferSize <= 0)
+                { 
+                    int defaultSize = Configuration.GetValue<int>("SplitterConfig:Buffersize");
+                    if (FileSplittingInfo.ChunkSize > 0 && FileSplittingInfo.ChunkSize < defaultSize)
+                        _bufferSize = (int)FileSplittingInfo.ChunkSize;
+                    else
+                    {
+                        using (Process proc = Process.GetCurrentProcess())
+                        {
+                            long memory = proc.PrivateMemorySize64;
+                            if (FileSplittingInfo.ChunkSize > 0)
+                            {
+                                _bufferSize = ProcessUtils.GetMemoryOptimisedBufferSize(memory, FileSplittingInfo.ChunkSize);
+                            }
+                            else if (FileSplittingInfo.NumberOfChunks > 0)
+                            {
+                                long fileSize = new FileInfo(FileSplittingInfo.FilePath).Length;
+                                long chunkSize = (long)Math.Ceiling((double)fileSize / FileSplittingInfo.NumberOfChunks);
+                                _bufferSize = ProcessUtils.GetMemoryOptimisedBufferSize(memory, chunkSize);
+                            }
+                            else
+                                _bufferSize = defaultSize;
+                        }
+                    }   
+                }
+                return _bufferSize;
             }
         }
 
@@ -39,21 +63,5 @@ namespace FileSplitterMerger.Splitter
         }
 
         abstract public Task Split();
-
-        protected internal static string GetChunkFileName(string fileName, string path, int chunkNumber) =>
-            $"{path}{Path.DirectorySeparatorChar}{fileName}.part_{chunkNumber}";
-
-        protected internal int GetCurrentBufferSize(long currentChunkSize, long chunkSize)
-        {
-            if (currentChunkSize + BufferSize <= chunkSize)
-                return BufferSize;
-            else
-            {
-                if (BufferSize > chunkSize)
-                    return (int)chunkSize;
-                else
-                    return (int)(chunkSize - currentChunkSize);
-            }
-        }
     }
 }

@@ -37,7 +37,7 @@ namespace FileSplitterMerger.Splitter
             {
                 for (int i = 0; i < numberOfChunks; i++)
                 {
-                    string chunkFileName = GetChunkFileName(fileInfo.Name, FileSplittingInfo.DestinationPath, i + 1);
+                    string chunkFileName = ProcessUtils.GetChunkFileName(fileInfo.Name, FileSplittingInfo.DestinationPath, i + 1);
 
                     using (var writeStream = new FileStream(chunkFileName,
                                                             FileMode.Create,
@@ -55,7 +55,7 @@ namespace FileSplitterMerger.Splitter
                         long currentChunkSize = 0;
                         while (currentChunkSize < currentChunkFinalSize)
                         {
-                            int currentBufferSize = GetCurrentBufferSize(currentChunkSize, currentChunkFinalSize);
+                            int currentBufferSize = ProcessUtils.GetCurrentBufferSize(currentChunkSize, currentChunkFinalSize, BufferSize);
 
                             byte[] currentBuffer = new byte[currentBufferSize];
                             await readStream.ReadAsync(currentBuffer, 0, currentBufferSize);

@@ -64,10 +64,10 @@ namespace FileSplitterMergerTests.SplitterMergerTests
                     _mergeArgument.ArgumentSwitch, 
                     _merge_destinationFileArgument.ArgumentSwitch, 
                     mergeDestinationPath, 
-                    _merge_filePartsArgument.ArgumentSwitch, 
-                    GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 1), 
-                    GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 2), 
-                    GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 3) 
+                    _merge_filePartsArgument.ArgumentSwitch,
+                    ProcessUtils.GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 1),
+                    ProcessUtils.GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 2),
+                    ProcessUtils.GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 3) 
                 },
                 fileInfoA.FullName,
                 mergeDestinationPath,
@@ -93,9 +93,9 @@ namespace FileSplitterMergerTests.SplitterMergerTests
                     _merge_destinationFileArgument.ArgumentSwitch,
                     mergeDestinationPath,
                     _merge_filePartsArgument.ArgumentSwitch,
-                    GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 1),
-                    GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 2),
-                    GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 3)
+                    ProcessUtils.GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 1),
+                    ProcessUtils.GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 2),
+                    ProcessUtils.GetChunkFileName(fileInfoA.Name, fileInfoA.DirectoryName, 3)
                 },
                 fileInfoA.FullName,
                 mergeDestinationPath,
@@ -152,7 +152,7 @@ namespace FileSplitterMergerTests.SplitterMergerTests
                         long bytesRead = 0;
                         while (bytesRead < originalFileInfo.Length)
                         {
-                            int currentBufferSize = GetCurrentBufferSize(bytesRead, originalFileInfo.Length, bufferSize);
+                            int currentBufferSize = ProcessUtils.GetCurrentBufferSize(bytesRead, originalFileInfo.Length, bufferSize);
                             byte[] originalBuffer = new byte[currentBufferSize];
                             byte[] actualBuffer = new byte[currentBufferSize];
 
@@ -184,22 +184,6 @@ namespace FileSplitterMergerTests.SplitterMergerTests
                 {
                     File.Delete(file.FullName);
                 }
-            }
-        }
-
-        protected internal static string GetChunkFileName(string fileName, string path, int chunkNumber) =>
-            $"{path}{Path.DirectorySeparatorChar}{fileName}.part_{chunkNumber}";
-
-        protected internal int GetCurrentBufferSize(long currentFileSize, long finalFileSize, int defaultBufferSize)
-        {
-            if (currentFileSize + defaultBufferSize <= finalFileSize)
-                return defaultBufferSize;
-            else
-            {
-                if (defaultBufferSize > finalFileSize)
-                    return (int)finalFileSize;
-                else
-                    return (int)(finalFileSize - currentFileSize);
             }
         }
     }

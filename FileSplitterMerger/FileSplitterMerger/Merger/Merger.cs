@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,9 +24,22 @@ namespace FileSplitterMerger.Merger
         {
             get
             {
-                if (_bufferSize == 0)
-                    _bufferSize = Configuration.GetValue<int>("SplitterConfig:Buffersize");
-
+                if (_bufferSize <= 0)
+                {
+                    int defaultSize = Configuration.GetValue<int>("SplitterConfig:Buffersize");
+                    
+                    using (Process proc = Process.GetCurrentProcess())
+                    {
+                        if (FileMergingInfo.FileParts?.Any() ?? false)
+                        {
+                            var smallestChunkSize = FileMergingInfo.FileParts.Select(x => new FileInfo(x).Length).OrderBy(x => x).First();
+                            long memory = proc.PrivateMemorySize64;
+                            _bufferSize = ProcessUtils.GetMemoryOptimisedBufferSize(memory, smallestChunkSize);
+                        }
+                        else
+                            _bufferSize = defaultSize;
+                    }
+                }
                 return _bufferSize;
             }
             set { _bufferSize = value; }
@@ -85,7 +99,7 @@ namespace FileSplitterMerger.Merger
                     long bytesCopiedFromChunk = 0;
                     while (bytesCopiedFromChunk < currentChunkSize)
                     {
-                        int currentBufferSize = GetCurrentBufferSize(bytesCopiedFromChunk, currentChunkSize);
+                        int currentBufferSize = ProcessUtils.GetCurrentBufferSize(bytesCopiedFromChunk, currentChunkSize, BufferSize);
 
                         byte[] currentBuffer = new byte[currentBufferSize];
                         await readStream.ReadAsync(currentBuffer, 0, currentBufferSize);
@@ -104,19 +118,6 @@ namespace FileSplitterMerger.Merger
 
             if (destinationFileSize - totalChunksSize != 0)
                 throw new FileSplitterMergerException($"File not split correctly! Difference in bytes: { totalChunksSize - destinationFileSize }");
-        }
-
-        protected internal int GetCurrentBufferSize(long currentChunkSize, long chunkSize)
-        {
-            if (currentChunkSize + BufferSize <= chunkSize)
-                return BufferSize;
-            else
-            {
-                if (BufferSize > chunkSize)
-                    return (int)chunkSize;
-                else
-                    return (int)(chunkSize - currentChunkSize);
-            }
         }
     }
 }
