@@ -46,3 +46,8 @@ The files aren't loaded in memory but they're read and written using streams and
 The buffer size used by the streams adapts to the available machine memory for improved performance (e.g. with very large files)<br>
 Custom enum description attributes are used for making argument detection and management easier.<br>
 Dependency injection is used for the configuration.<br>Extensive unit tests have been included to ensure the correct behaviour in a variety of scenarios.
+<br><br>
+## Download
+If you just want to try this as is, you can download it for Windows and Linux from the following archives:
+- [FileSplitterMerger_1.0.0_win64_self-contained.zip](/dist/FileSplitterMerger_1.0.0_win64_self-contained.zip)
+- [FileSplitterMerger_1.0.0_ubuntu.16.04-x64_self-contained.tar.gz](/dist/FileSplitterMerger_1.0.0_ubuntu.16.04-x64_self-contained.tar.gz)
