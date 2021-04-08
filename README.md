@@ -21,17 +21,17 @@
 <br><br>
 ## Examples:
 The first argument must be an operation option. The rest of the arguments can be in any order.<br>
-### Split a file in chunks of specified size:<br>
+### Split a file in chunks of specified size:
 `FileSplitterMerger -s -f <path to file you want to split> -d <destination folder> -s <chunk size in bytes>`
 <br><br>
-### Split a file in number of chunks:<br>
+### Split a file in number of chunks:
 `FileSplitterMerger -s -f <path to file you want to split> -d <destination folder> -n <number of chunks>`
 <br><br>
-### Merge files:<br>
+### Merge files:
 `FileSplitterMerger -m -p <file path 1> <file path 2> <file path 3> -d <destination file path>`
 <br><br>
-## Publish<br>
-### Publish for Linux<br>
+## Publish
+### Publish for Linux
 The beauty of .NET 5 is it's multi-platform, so you can run this app on Linux by publishing it as follows:<br>
 `dotnet publish -c release -r ubuntu.16.04-x64 --self-contained --output <destination folder>`
 <br>
@@ -39,7 +39,6 @@ The beauty of .NET 5 is it's multi-platform, so you can run this app on Linux by
 `dotnet FileSplitterMerger.dll <arguments: see examples above for the arguments>`
 <br><br>
 ### Publish for Windows
-The beauty of .NET 5 is it's multi-platform, so you can run this app on Linux by publishing it as follows:<br>
 `dotnet publish -c release -r win-x64 --self-contained --output <destination folder>`
 <br><br>
 ## Implementation notes
