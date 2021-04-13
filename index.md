@@ -52,6 +52,4 @@ Dependency injection is used for the configuration.<br>Extensive unit tests have
 <br><br>
 
 ## Download
-If you just want to try this as is, you can download it for Windows and Linux from the following archives:
-- [FileSplitterMerger_1.0.0_win64_self-contained.zip](/dist/FileSplitterMerger_1.0.0_win64_self-contained.zip?raw=true)
-- [FileSplitterMerger_1.0.0_ubuntu.16.04-x64_self-contained.tar.gz](/dist/FileSplitterMerger_1.0.0_ubuntu.16.04-x64_self-contained.tar.gz?raw=true)
+You can download this for Windows and Linux from the [releases section](https://github.com/erionpc/FileSplitterMerger/releases)
