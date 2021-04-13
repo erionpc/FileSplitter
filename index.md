@@ -1,5 +1,3 @@
-# File Splitter Merger
-
 ## Operation options:
 -s = File split<br>
 -m = File merge<br>
