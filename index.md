@@ -1,37 +1,59 @@
-## Welcome to GitHub Pages
+# File Splitter Merger
 
-You can use the [editor on GitHub](https://github.com/erionpc/FileSplitterMerger/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## Operation options:
+-s = File split<br>
+-m = File merge<br>
+-i = Syntax info
+<br><br>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Split options:
+-f = File path<br>
+-d = Destination path<br>
+-n = Split in number of chunks<br>
+-s = Split in chunks of size in bytes
+<br><br>
 
-### Markdown
+## Merge options:
+-p = File parts<br>
+-d = Destination file path
+<br><br>
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Examples:
+The first argument must be an operation option. The rest of the arguments can be in any order.<br>
+### Split a file in chunks of specified size:
+`FileSplitterMerger -s -f <path to file you want to split> -d <destination folder> -s <chunk size in bytes>`
+<br><br>
 
-```markdown
-Syntax highlighted code block
+### Split a file in number of chunks:
+`FileSplitterMerger -s -f <path to file you want to split> -d <destination folder> -n <number of chunks>`
+<br><br>
 
-# Header 1
-## Header 2
-### Header 3
+### Merge files:
+`FileSplitterMerger -m -p <file path 1> <file path 2> <file path 3> -d <destination file path>`
+<br><br>
 
-- Bulleted
-- List
+## Publish
+### Publish for Linux
+The beauty of .NET 5 is it's multi-platform, so you can run this app on Linux by publishing it as follows:<br>
+`dotnet publish -c release -r ubuntu.16.04-x64 --self-contained --output <destination folder>`
+<br>
 
-1. Numbered
-2. List
+### Run on Linux:
+`dotnet FileSplitterMerger.dll <arguments: see examples above for the arguments>`
+<br><br>
 
-**Bold** and _Italic_ and `Code` text
+### Publish for Windows
+`dotnet publish -c release -r win-x64 --self-contained --output <destination folder>`
+<br><br>
 
-[Link](url) and ![Image](src)
-```
+## Implementation notes
+The files aren't loaded in memory but they're read and written using streams and buffers. This means that the memory fingerprint of this application is minimal and it can handle files of any size.<br>
+The buffer size used by the streams adapts to the available machine memory for improved performance (e.g. with very large files)<br>
+Custom enum description attributes are used for making argument detection and management easier.<br>
+Dependency injection is used for the configuration.<br>Extensive unit tests have been included to ensure the correct behaviour in a variety of scenarios.
+<br><br>
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/erionpc/FileSplitterMerger/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## Download
+If you just want to try this as is, you can download it for Windows and Linux from the following archives:
+- [FileSplitterMerger_1.0.0_win64_self-contained.zip](/dist/FileSplitterMerger_1.0.0_win64_self-contained.zip?raw=true)
+- [FileSplitterMerger_1.0.0_ubuntu.16.04-x64_self-contained.tar.gz](/dist/FileSplitterMerger_1.0.0_ubuntu.16.04-x64_self-contained.tar.gz?raw=true)
